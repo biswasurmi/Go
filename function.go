@@ -1,9 +1,11 @@
 package main
+
 import ( // multiple import
 	"fmt"
 	"os"
 )
-func average (xs[]float64) float64 {
+
+func average(xs []float64) float64 {
 	var tot float64 = 0.0
 	for i := 0; i < len(xs); i++ {
 		tot += xs[i]
@@ -14,17 +16,17 @@ func f2() (r int) { // naming return type
 	r = 1
 	return
 }
-func multi() (int, int){ // returning multiple value
+func multi() (int, int) { // returning multiple value
 	return 5, 6
 }
-func add (nums ...int) int {
+func add(nums ...int) int {
 	var tot int = 0
-	for _, value := range nums{
+	for _, value := range nums {
 		tot += value
 	}
 	return tot
 }
-func main(){
+func main() {
 	arr := []float64{1, 2, 3, 4, 5}
 	fmt.Println(average(arr))
 	fmt.Println(f2())
@@ -32,7 +34,7 @@ func main(){
 	fmt.Println(x, y)
 	/// variadic functions
 	/* you can pass as many arguments as you wish, no need to fix the number and passes each element as a separate argument */
-	fmt.Println(add(1,2,3))
+	fmt.Println(add(1, 2, 3))
 	fmt.Println(add(3, 4))
 	xs := []int{1, 2, 3, 4, 5}
 	fmt.Println(add(xs...))
@@ -65,11 +67,11 @@ func main(){
 	defer f.Close()
 
 	///panic and recover => PANIC stops the execution of current function when something goes very wrong, recover stops the panic but it works only when it is inside of any deferred function
-	defer func(){
+	defer func() {
 		str := recover()
 		fmt.Println("Recovered from : ", str)
 	}()
-	panic ("PANIC")
+	panic("PANIC")
 
 }
 func first() {
@@ -83,16 +85,16 @@ func third() {
 }
 func evenGenerator() func() int {
 	i := 0
-	return func() (ret int){
+	return func() (ret int) {
 		ret = i
 		i += 2
 		return
 	}
 }
-func factorial(x int) int{
-	if x == 1{
+func factorial(x int) int {
+	if x == 1 {
 		return 1
 	} else {
-		return x * factorial(x - 1)
+		return x * factorial(x-1)
 	}
 }

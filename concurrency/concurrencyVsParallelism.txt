@@ -1,0 +1,34 @@
+## 🏃 Concurrency = Relay Race 🏃
+
+* Only **one runner** runs at a time.
+* But the team is working **together toward one goal**.
+* Each person waits for their **turn**, and when one finishes, the **baton is passed** to the next.
+* They're **not running at the same time**, but their tasks are being **managed in sequence** with good coordination.
+
+> 🧠 **Concurrency = Smart task switching.** Tasks take turns efficiently.
+
+---
+
+## 👟 Parallelism = Everyone Running Together 🏃🏃🏃🏃
+
+* Imagine **all runners start at once**, each on their **own track**.
+* All are **actively working** at the same time.
+* You get **maximum speed** because there's no waiting or switching.
+
+> 🧠 **Parallelism = Tasks actually run simultaneously**, using multiple CPUs or cores.
+
+---
+
+### 🧠 Bonus Comparison Table with Analogy
+
+| Concept         | Real-world Analogy                     | How It Works                 |
+| --------------- | -------------------------------------- | ---------------------------- |
+| **Concurrency** | Relay race (1 runner at a time)        | Tasks take turns efficiently |
+| **Parallelism** | 100m race with 4 lanes (everyone runs) | Tasks run at the same time   |
+
+---
+
+### ✅ Summary
+
+* ✅ **Concurrency** is about **handling** many tasks at once (relay race).
+* ✅ **Parallelism** is about **executing** many tasks at the same time (everyone runs).

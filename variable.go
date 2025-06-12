@@ -1,9 +1,10 @@
 package main
 
 import "fmt"
-//globalVariable := 10 // will show error as := this is only for local function
+
+// globalVariable := 10 // will show error as := this is only for local function
 var globalVariable = 10 // you must use var for global variable
-func main(){
+func main() {
 	var x string // var variable_name variable_type
 	x = "Hlw world!"
 	fmt.Println(x)
@@ -23,18 +24,18 @@ func main(){
 	const con = 10
 	// con = 12 // error as assigning is not allowed for constants
 
-	var(
-		a = 5
+	var (
+		a        = 5
 		b string = "hlw"
 	)
 	fmt.Println(a, b)
 	//example()
 	celToFar()
 }
-func f(){
+func f() {
 	fmt.Println(globalVariable)
 }
-func example(){
+func example() {
 	var input float64
 	fmt.Print("enter a float number ")
 	fmt.Scanf("%f", &input)
@@ -43,10 +44,10 @@ func example(){
 	output += 1
 	fmt.Println(output)
 }
-func celToFar(){
+func celToFar() {
 	var far float64
 	fmt.Scanf("%f", &far)
-	var cel float64 = ((far - 32) * ( 5.0/ 9))
+	var cel float64 = ((far - 32) * (5.0 / 9))
 	fmt.Println(cel)
 
 }
