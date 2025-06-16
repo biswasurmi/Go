@@ -1,0 +1,70 @@
+🔧 STEP 1: Set up the folder structure
+Create the main project folder:
+
+cd Desktop/Go
+
+mkdir packages
+
+cd packages
+
+📄 STEP 2: Create main.go
+This is the main application that will use the custom package.
+
+📄 main.go:
+
+package main
+
+import (
+	"fmt"
+	"golang-book/chapter11/math"
+)
+
+func main() {
+	xs := []float64{1, 2, 3, 4}
+	avg := math.Average(xs)
+	fmt.Println(avg)
+}
+🧮 STEP 3: Create the custom math package
+
+
+mkdir math
+cd math
+Create the file math.go with this content:
+
+📄 math.go:
+
+
+package math
+
+// Finds the average of a series of numbers
+func Average(xs []float64) float64 {
+	total := float64(0)
+	for _, x := range xs {
+		total += x
+	}
+	return total / float64(len(xs))
+}
+⚠️ Important:
+
+Function name is Average with a capital A – this makes it exported, i.e., accessible from other packages.
+
+📦 STEP 4: Compile the package with go install
+In the packages/ folder:
+
+go mod init example.com/packages
+
+In the math/ folder
+
+go install
+
+
+▶️ STEP 5: Run the main program
+Go back to the parent folder:
+
+
+cd ..
+go run main.go
+
+
+*** godoc /math Average
+=> create documentation

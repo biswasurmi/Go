@@ -1,0 +1,35 @@
+urmi@urmi-HP-Laptop:~/Desktop/Go$ mkdir dadjoke-cli
+urmi@urmi-HP-Laptop:~/Desktop/Go$ cd dadjoke-cli
+urmi@urmi-HP-Laptop:~/Desktop/Go/dadjoke-cli$ go mod init github.com/biswasurmi/dadjoke-cli
+go: creating new go.mod: module github.com/biswasurmi/dadjoke-cli
+urmi@urmi-HP-Laptop:~/Desktop/Go/dadjoke-cli$ cobra-cli init
+Your Cobra application is ready at
+/home/urmi/Desktop/Go/dadjoke-cli
+urmi@urmi-HP-Laptop:~/Desktop/Go/dadjoke-cli$ go run main.go
+A longer description that spans multiple lines and likely contains
+examples and usage of using your application. For example:
+
+Cobra is a CLI library for Go that empowers applications.
+This application is a tool to generate the needed files
+to quickly create a Cobra application.
+
+urmi@urmi-HP-Laptop:~/Desktop/Go/dadjoke-cli$ go run main.go
+Dadjoke CLI is a tool that gives you a random dad joke
+
+urmi@urmi-HP-Laptop:~/Desktop/Go/dadjoke-cli$ cobra add random
+cobra: command not found
+urmi@urmi-HP-Laptop:~/Desktop/Go/dadjoke-cli$ cobra-cli add random
+random created at /home/urmi/Desktop/Go/dadjoke-cli
+urmi@urmi-HP-Laptop:~/Desktop/Go/dadjoke-cli$ ls
+cmd  go.mod  go.sum  LICENSE  main.go
+urmi@urmi-HP-Laptop:~/Desktop/Go/dadjoke-cli$ curl -H "Accept: application/json" https://icanhazdadjoke.com/
+{"id":"nbFBdiydxkb","joke":"Why did the barber win the race? He took a short cut.","status":200}
+urmi@urmi-HP-Laptop:~/Desktop/Go/dadjoke-cli$ go run main.go random
+# github.com/biswasurmi/dadjoke-cli/cmd
+cmd/random.go:17:3: undefined: getRandomJoke
+urmi@urmi-HP-Laptop:~/Desktop/Go/dadjoke-cli$ go run main.go random
+Error: unknown command "random" for "dadjoke-cli"
+Run 'dadjoke-cli --help' for usage.
+exit status 1
+urmi@urmi-HP-Laptop:~/Desktop/Go/dadjoke-cli$ go run main.go random
+Get random joke :P
