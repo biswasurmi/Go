@@ -16,8 +16,7 @@ to quickly create a Cobra application.
 urmi@urmi-HP-Laptop:~/Desktop/Go/dadjoke-cli$ go run main.go
 Dadjoke CLI is a tool that gives you a random dad joke
 
-urmi@urmi-HP-Laptop:~/Desktop/Go/dadjoke-cli$ cobra add random
-cobra: command not found
+
 urmi@urmi-HP-Laptop:~/Desktop/Go/dadjoke-cli$ cobra-cli add random
 random created at /home/urmi/Desktop/Go/dadjoke-cli
 urmi@urmi-HP-Laptop:~/Desktop/Go/dadjoke-cli$ ls
