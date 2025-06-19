@@ -287,4 +287,50 @@ text
 Copy
 Edit
 Book not found
+
+
+w.Header().Set("Content-Type", "application/json")
+🔍 What it does:
+This tells the client (like curl, a browser, or Postman):
+
+“The response body is in JSON format.”
+
+It sets the HTTP response header:
+
+pgsql
+Copy
+Edit
+Content-Type: application/json
+🤖 Why it's important:
+Many clients use this header to decide how to parse the response.
+
+Without this, the client might treat the response as plain text or HTML.
+
+✅ This line is always recommended when you're sending JSON from a Go server.
+
+
+json.NewEncoder(w).Encode(updatedBook)
+🔍 What it does:
+It creates a JSON encoder that writes directly to the http.ResponseWriter (w).
+
+It serializes (marshals) updatedBook into JSON.
+
+Then it writes that JSON into the response body.
+
+This is equivalent to:
+
+go
+Copy
+Edit
+jsonBytes, _ := json.Marshal(updatedBook)
+w.Write(jsonBytes)
+But using json.NewEncoder(w).Encode(...) is:
+
+Cleaner
+
+More efficient (direct streaming)
+
+Automatically writes a newline after the JSON
+
+
 */
