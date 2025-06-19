@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"net/http"
 	"time"
@@ -47,7 +48,14 @@ func main() {
 		r.Delete("/{id}", deleteBook) // DELETE /api/v1/books/{id}
 	})
 
-	http.ListenAndServe(":8080", r)
+
+	var port string
+	flag.StringVar(&port, "port", "8080", "Port to run the book server")
+	flag.Parse()
+	addr := fmt.Sprintf(":%s", port)
+	fmt.Println("Starting server or port", port)
+
+	http.ListenAndServe(addr, r)
 }
 
 // jwt token
