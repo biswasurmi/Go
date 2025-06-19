@@ -4,9 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/jwtauth/v5"
 	"github.com/google/uuid"
 )
 
@@ -19,23 +21,80 @@ type Book struct {
 	ISBN        string   `json:"isbn"`
 }
 
-var bookStore = make(map[string]Book)
+var (
+	tokenAuth *jwtauth.JWTAuth
+	adminUser = "AdminUser"
+	adminPass = "AdminPassword"
+	bookStore = make(map[string]Book)
+)
 
 func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 
+	r.Get("/api/v1/get-token", getTokenHandler)
 	// Mount subrouter under /api/v1/books
 	r.Route("/api/v1/books", func(r chi.Router) {
-		r.Post("/", createBook)         // POST /api/v1/books
-		r.Get("/", listBooks)           // GET /api/v1/books
-		r.Get("/{id}", getBook)         // GET /api/v1/books/{id}
-		r.Put("/{id}", updateBook)      // PUT /api/v1/books/{id}
-		r.Delete("/{id}", deleteBook)   // DELETE /api/v1/books/{id}
+		//r.Use(basicAuthMiddleware(adminUser, adminPass)) // curl -u AdminUser:AdminPassword http://localhost:8080/api/v1/books for basic authentication
+
+		r.Use(jwtauth.Verifier(tokenAuth))      // Verifies JWT from header/cookie
+		r.Use(jwtauth.Authenticator(tokenAuth)) // Rejects unauthorized
+
+		r.Post("/", createBook)       // POST /api/v1/books
+		r.Get("/", listBooks)         // GET /api/v1/books
+		r.Get("/{id}", getBook)       // GET /api/v1/books/{id}
+		r.Put("/{id}", updateBook)    // PUT /api/v1/books/{id}
+		r.Delete("/{id}", deleteBook) // DELETE /api/v1/books/{id}
 	})
 
 	http.ListenAndServe(":8080", r)
 }
+
+// jwt token
+func getTokenHandler(w http.ResponseWriter, r *http.Request) {
+	user, pass, ok := r.BasicAuth()
+	if !ok || user != adminUser || pass != adminPass {
+		w.Header().Set("WWW-Authenticate", `Basic realm="Restricted"`)
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	//exp := jwtauth.ExpireIn(100000 * 60) // returns int64
+	exp := time.Now().Add(100000 * time.Minute).Unix()
+
+	_, tokenString, err := tokenAuth.Encode(map[string]interface{}{
+		"user_id":  123,
+		"username": adminUser,
+		"exp":      exp,
+	})
+	if err != nil {
+		http.Error(w, "Failed to generate token", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]string{
+		"token": tokenString,
+	})
+}
+
+func init() {
+	tokenAuth = jwtauth.New("HS256", []byte("supersecretkey123"), nil)
+}
+
+// func basicAuthMiddleware(username, password string) func(http.Handler) http.Handler {
+// 	return func(next http.Handler) http.Handler {
+// 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+// 			user, pass, ok := r.BasicAuth()
+// 			if !ok || user != username || pass != password {
+// 				w.Header().Set("WWW-Authenticate", `Basic realm="Restricted"`)
+// 				http.Error(w, "Unauthorized", http.StatusUnauthorized)
+// 				return
+// 			}
+// 			next.ServeHTTP(w, r)
+// 		})
+// 	}
+// }
 
 // Create a book
 func createBook(w http.ResponseWriter, r *http.Request) {
@@ -111,7 +170,6 @@ func deleteBook(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(book)
 }
-
 
 /*
 
