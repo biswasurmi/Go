@@ -32,14 +32,16 @@ var (
 func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
-
+	var authEnable bool
 	r.Get("/api/v1/get-token", getTokenHandler)
 	// Mount subrouter under /api/v1/books
 	r.Route("/api/v1/books", func(r chi.Router) {
 		//r.Use(basicAuthMiddleware(adminUser, adminPass)) // curl -u AdminUser:AdminPassword http://localhost:8080/api/v1/books for basic authentication
 
-		r.Use(jwtauth.Verifier(tokenAuth))      // Verifies JWT from header/cookie
-		r.Use(jwtauth.Authenticator(tokenAuth)) // Rejects unauthorized
+		if authEnable {
+			r.Use(jwtauth.Verifier(tokenAuth))      // Verifies JWT from header/cookie
+			r.Use(jwtauth.Authenticator(tokenAuth)) // Rejects unauthorized
+		}
 
 		r.Post("/", createBook)       // POST /api/v1/books
 		r.Get("/", listBooks)         // GET /api/v1/books
@@ -48,10 +50,14 @@ func main() {
 		r.Delete("/{id}", deleteBook) // DELETE /api/v1/books/{id}
 	})
 
-
 	var port string
+
+	flag.BoolVar(&authEnable, "auth", true, "Enable authentication")
 	flag.StringVar(&port, "port", "8080", "Port to run the book server")
 	flag.Parse()
+	if !authEnable {
+		fmt.Println("Authentication is disabled")
+	}
 	addr := fmt.Sprintf(":%s", port)
 	fmt.Println("Starting server or port", port)
 

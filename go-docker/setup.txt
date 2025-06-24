@@ -1,0 +1,18 @@
+urmi@urmi-HP-Laptop:~/Desktop/Go$ mkdir go-docker
+urmi@urmi-HP-Laptop:~/Desktop/Go$ cd go-docker
+urmi@urmi-HP-Laptop:~/Desktop/Go/go-docker$ go mod init go-docker
+go: creating new go.mod: module go-docker
+urmi@urmi-HP-Laptop:~/Desktop/Go/go-docker$ touch hello_server.go
+urmi@urmi-HP-Laptop:~/Desktop/Go/go-docker$ go build
+hello_server.go:13:2: no required module provides package github.com/gorilla/mux; to add it:
+        go get github.com/gorilla/mux
+hello_server.go:14:2: no required module provides package gopkg.in/natefinch/lumberjack.v2; to add it:
+        go get gopkg.in/natefinch/lumberjack.v2
+urmi@urmi-HP-Laptop:~/Desktop/Go/go-docker$ go get github.com/gorilla/mux
+go: downloading github.com/gorilla/mux v1.8.1
+go: added github.com/gorilla/mux v1.8.1
+urmi@urmi-HP-Laptop:~/Desktop/Go/go-docker$ go get gopkg.in/natefinch/lumberjack.v2
+go: downloading gopkg.in/natefinch/lumberjack.v2 v2.2.1
+go: added gopkg.in/natefinch/lumberjack.v2 v2.2.1
+urmi@urmi-HP-Laptop:~/Desktop/Go/go-docker$ go build
+urmi@urmi-HP-Laptop:~/Desktop/Go/go-docker$ ./go-docker

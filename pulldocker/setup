@@ -1,0 +1,62 @@
+urmi@urmi-HP-Laptop:~/Desktop/Go/chi$ cd ..
+urmi@urmi-HP-Laptop:~/Desktop/Go$ cd pulldocker
+
+
+urmi@urmi-HP-Laptop:~/Desktop/Go/pulldocker$ docker pull urmibiswas/mychi
+Using default tag: latest
+latest: Pulling from urmibiswas/mychi
+Digest: sha256:af7b76955e17fea4f75019e3d2d4aaf238dde20e45495a1c15328665b094e17e
+Status: Image is up to date for urmibiswas/mychi:latest
+docker.io/urmibiswas/mychi:latest
+
+urmi@urmi-HP-Laptop:~/Desktop/Go/pulldocker$ docker run -p 8080:8080/api/v1/books
+docker: 'docker run' requires at least 1 argument
+
+Usage:  docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
+
+See 'docker run --help' for more information
+urmi@urmi-HP-Laptop:~/Desktop/Go/pulldocker$ docker run -p 8080:8080 urmibiswas/myChi
+docker: invalid reference format: repository name (urmibiswas/myChi) must be lowercase
+
+Run 'docker run --help' for more information
+
+urmi@urmi-HP-Laptop:~/Desktop/Go/pulldocker$ docker run -p 8080:8080 urmibiswas/mychi
+Starting server or port 8080
+2025/06/23 11:50:39 "GET http://localhost:8080/api/v1/books HTTP/1.1" from 172.17.0.1:44950 - 200 5B in 124.303µs
+2025/06/23 11:51:32 "POST http://localhost:8080/api/v1/books HTTP/1.1" from 172.17.0.1:37022 - 200 142B in 82.274µs
+2025/06/23 11:51:41 "GET http://localhost:8080/api/v1/books HTTP/1.1" from 172.17.0.1:45604 - 200 144B in 51.256µs
+
+
+urmi@urmi-HP-Laptop:~/Desktop/Go/pulldocker$ curl http://localhost:8080/api/v1/books
+null
+urmi@urmi-HP-Laptop:~/Desktop/Go/pulldocker$ curl -X PUT http://localhost:8080/api/v1/books/<uuid> \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Updated Book",
+    "authorList": ["John Doe", "Jane Smith"],
+    "publishDate": "2024-01-01",
+    "isbn": "987-6543210000" 
+  }'
+bash: uuid: No such file or directory
+urmi@urmi-HP-Laptop:~/Desktop/Go/pulldocker$ curl -X POST http://localhost:8080/api/v1/books \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Go Book",
+    "authorList": ["John Doe"],
+    "publishDate": "2023-01-01",
+    "isbn": "123-4567890123"
+  }'
+{"uuid":"0db0a145-1f53-4aee-8a45-84859bbace06","name":"Go Book","authorList":["John Doe"],"publishDate":"2023-01-01","isbn":"123-4567890123"}
+urmi@urmi-HP-Laptop:~/Desktop/Go/pulldocker$ curl http://localhost:8080/api/v1/books
+[{"uuid":"0db0a145-1f53-4aee-8a45-84859bbace06","name":"Go Book","authorList":["John Doe"],"publishDate":"2023-01-01","isbn":"123-4567890123"}]
+urmi@urmi-HP-Laptop:~/Desktop/Go/pulldocker$ curl -X PUT http://localhost:8080/api/v1/books/<uuid> \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Updated Book",
+    "authorList": ["John Doe", "Jane Smith"],
+    "publishDate": "2024-01-01",
+    "isbn": "987-6543210000"
+  }'
+bash: uuid: No such file or directory
+urmi@urmi-HP-Laptop:~/Desktop/Go/pulldocker$ 
+

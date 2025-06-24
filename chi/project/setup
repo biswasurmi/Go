@@ -1,0 +1,313 @@
+urmi@urmi-HP-Laptop:~/Desktop/Go/go-docker$ cd ..
+
+urmi@urmi-HP-Laptop:~/Desktop/Go$ cd project
+bash: cd: project: No such file or directory
+
+urmi@urmi-HP-Laptop:~/Desktop/Go$ cd chi/project
+
+urmi@urmi-HP-Laptop:~/Desktop/Go/chi/project$ go build
+go: downloading go1.23 (linux/amd64)
+go: download go1.23 for linux/amd64: toolchain not available
+
+urmi@urmi-HP-Laptop:~/Desktop/Go/chi/project$ ./go-docker
+bash: ./go-docker: No such file or directory
+
+urmi@urmi-HP-Laptop:~/Desktop/Go/chi/project$ ./book-server
+bash: ./book-server: No such file or directory
+
+urmi@urmi-HP-Laptop:~/Desktop/Go/chi/project$ ./project
+bash: ./project: No such file or directory
+
+urmi@urmi-HP-Laptop:~/Desktop/Go/chi/project$ GOTOOLCHAIN=local go build
+go: go.mod requires go >= 1.23 (running go 1.22.2; GOTOOLCHAIN=local)
+
+urmi@urmi-HP-Laptop:~/Desktop/Go/chi/project$ go build
+go: downloading go1.23 (linux/amd64)
+go: download go1.23 for linux/amd64: toolchain not available
+
+urmi@urmi-HP-Laptop:~/Desktop/Go/chi/project$ ls -l
+total 24
+-rw-rw-r-- 1 urmi urmi  558 Jun 23 16:06 Dockerfile
+-rw-rw-r-- 1 urmi urmi  706 Jun 23 16:06 go.mod
+-rw-rw-r-- 1 urmi urmi 3083 Jun 19 14:57 go.sum
+-rw-rw-r-- 1 urmi urmi 8881 Jun 23 16:03 main.go
+
+urmi@urmi-HP-Laptop:~/Desktop/Go/chi/project$ go mod tidy
+go: downloading github.com/stretchr/testify v1.9.0
+go: downloading gopkg.in/yaml.v3 v3.0.1
+go: downloading github.com/davecgh/go-spew v1.1.1
+go: downloading github.com/pmezard/go-difflib v1.0.0
+
+urmi@urmi-HP-Laptop:~/Desktop/Go/chi/project$ bo build
+bo: command not found
+
+urmi@urmi-HP-Laptop:~/Desktop/Go/chi/project$ go build
+
+urmi@urmi-HP-Laptop:~/Desktop/Go/chi/project$ ls -l
+total 9568
+-rw-rw-r-- 1 urmi urmi     558 Jun 23 16:06 Dockerfile
+-rw-rw-r-- 1 urmi urmi     683 Jun 23 17:22 go.mod
+-rw-rw-r-- 1 urmi urmi    3663 Jun 23 17:22 go.sum
+-rw-rw-r-- 1 urmi urmi    8881 Jun 23 16:03 main.go
+-rwxrwxr-x 1 urmi urmi 9770032 Jun 23 17:22 myChi
+
+urmi@urmi-HP-Laptop:~/Desktop/Go/chi/project$ ./mychi
+bash: ./mychi: No such file or directory
+
+urmi@urmi-HP-Laptop:~/Desktop/Go/chi/project$ ./myChi
+Starting server or port 8080
+2025/06/23 17:25:34 "GET http://localhost:8080/ HTTP/1.1" from [::1]:36754 - 404 19B in 7.624µs
+2025/06/23 17:26:34 "GET http://localhost:8080/api/v1/books HTTP/1.1" from [::1]:52924 - 200 5B in 106.228µs
+2025/06/23 17:33:00 "GET http://localhost:8080/api/v1/books HTTP/1.1" from [::1]:51186 - 200 5B in 46.316
+
+urmi@urmi-HP-Laptop:~/Desktop/Go$ cd project
+bash: cd: project: No such file or directory
+
+
+urmi@urmi-HP-Laptop:~/Desktop/Go$ cd chi/project
+
+
+urmi@urmi-HP-Laptop:~/Desktop/Go/chi/project$ curl http://localhost:8080
+404 page not found
+
+
+urmi@urmi-HP-Laptop:~/Desktop/Go/chi/project$ http://localhost:8080/api/v1/books
+bash: http://localhost:8080/api/v1/books: No such file or directory
+
+
+urmi@urmi-HP-Laptop:~/Desktop/Go/chi/project$ curl http://localhost:8080/api/v1/books
+null
+
+
+urmi@urmi-HP-Laptop:~/Desktop/Go/chi/project$ docker build -t myChi
+ERROR: docker: 'docker buildx build' requires 1 argument
+
+Usage:  docker buildx build [OPTIONS] PATH | URL | -
+
+Run 'docker buildx build --help' for more information
+
+
+urmi@urmi-HP-Laptop:~/Desktop/Go/chi/project$ docker build -t myChi .
+[+] Building 0.0s (0/0)                                         docker:default
+ERROR: invalid tag "myChi": repository name must be lowercase
+
+
+
+urmi@urmi-HP-Laptop:~/Desktop/Go/chi/project$ docker build -t mychi .
+[+] Building 11.8s (12/12) FINISHED                             docker:default
+ => [internal] load build definition from Dockerfile                      0.0s
+ => => transferring dockerfile: 744B                                      0.0s
+ => [internal] load metadata for docker.io/library/golang:latest          2.0s
+ => [auth] library/golang:pull token for registry-1.docker.io             0.0s
+ => [internal] load .dockerignore                                         0.0s
+ => => transferring context: 2B                                           0.0s
+ => [1/6] FROM docker.io/library/golang:latest@sha256:10c131810f80a4802c  0.0s
+ => [internal] load build context                                         0.0s
+ => => transferring context: 9.78MB                                       0.0s
+ => CACHED [2/6] WORKDIR /app                                             0.0s
+ => [3/6] COPY go.mod go.sum ./                                           0.0s
+ => [4/6] RUN go mod download                                             2.0s
+ => [5/6] COPY . .                                                        0.0s
+ => [6/6] RUN go build -o main .                                          7.4s
+ => exporting to image                                                    0.3s
+ => => exporting layers                                                   0.3s
+ => => writing image sha256:d350c694b08df52f203420b47978b865afa06785ff61  0.0s
+ => => naming to docker.io/library/mychi          
+ 
+ 
+                         0.0s
+urmi@urmi-HP-Laptop:~/Desktop/Go/chi/project$ image ls
+Command 'image' not found, did you mean:
+  command 'jimage' from deb openjdk-17-jdk-headless (17.0.14+7-1~24.04)
+  command 'jimage' from deb openjdk-21-jdk-headless (21.0.6+7-1~24.04.1)
+  command 'jimage' from deb openjdk-11-jdk-headless (11.0.26+4-1ubuntu1~24.04)
+  command 'jimage' from deb openjdk-19-jdk-headless (19.0.2+7-4)
+  command 'jimage' from deb openjdk-20-jdk-headless (20.0.2+9-1)
+  command 'jimage' from deb openjdk-22-jdk-headless (22~22ea-1)
+  command 'imagej' from deb imagej (1.54g-1)
+  command 'imagen' from deb hevea (2.36-2)
+  command 'timage' from deb argyll (3.1.0+repack-1)
+  command 'imake' from deb xutils-dev (1:7.7+6.2)
+Try: sudo apt install <deb name>
+
+
+urmi@urmi-HP-Laptop:~/Desktop/Go/chi/project$ docker image ls
+REPOSITORY                            TAG       IMAGE ID       CREATED             SIZE
+mychi                                 latest    d350c694b08d   16 seconds ago      1.01GB
+urmibiswas/go-docker                  latest    010626f30a06   About an hour ago   958MB
+go-docker                             latest    010626f30a06   About an hour ago   958MB
+urmibiswas/book-server                latest    32d67705adcf   About an hour ago   18.6MB
+urmibiswas/getting-started-todo-app   latest    a53bb040c1f4   5 hours ago         1.12GB
+UrmiBiswas/getting-started-todo-app   latest    a53bb040c1f4   5 hours ago         1.12GB
+getting-started-todo-app-backend      latest    1a7f8d3a36ca   5 hours ago         1.17GB
+getting-started-todo-app-client       latest    80fa3a5315a4   5 hours ago         1.19GB
+<none>                                <none>    e79a0cfcc227   5 hours ago         1.17GB
+traefik                               v2.11     d51ba6b37488   3 weeks ago         215MB
+mysql                                 8.0       355bbda86f66   2 months ago        772MB
+phpmyadmin                            latest    fa1259013896   5 months ago        570MB
+hello-world                           latest    74cc54e27dc4   5 months ago        10.1kB
+
+
+
+urmi@urmi-HP-Laptop:~/Desktop/Go/chi/project$ docker run -d -p 8080:8080 go-docker
+04235237dcfdbec413392dc08da4fc8bbecaba6931db9123cb38c4a3b7cc0bf8
+docker: Error response from daemon: failed to set up container networking: driver failed programming external connectivity on endpoint competent_moore (a94a0445cbabe116451d967684dfd77f7a1fde3810b7d652f955ffc5097ea4fa): failed to bind host port for 0.0.0.0:8080:172.17.0.3:8080/tcp: address already in use
+
+Run 'docker run --help' for more information
+
+
+urmi@urmi-HP-Laptop:~/Desktop/Go/chi/project$ docker container ls
+CONTAINER ID   IMAGE       COMMAND    CREATED          STATUS          PORTS                                         NAMES
+76358451039b   go-docker   "./main"   57 minutes ago   Up 57 minutes   0.0.0.0:8081->8080/tcp, [::]:8081->8080/tcp   elated_pasteur
+
+
+urmi@urmi-HP-Laptop:~/Desktop/Go/chi/project$ docker container stop 76358451039b
+76358451039b
+
+
+urmi@urmi-HP-Laptop:~/Desktop/Go/chi/project$ docker run -d -p 8080:8080 go-docker
+347c8d87092e29036037b2180d26b671329dac5bf90f436bc16ae4304db7a84b
+docker: Error response from daemon: failed to set up container networking: driver failed programming external connectivity on endpoint elated_borg (e329a0bf17ad2eb21e781ab5535ec48be5a03bc3bec4bd28ee372686a5ca9d83): failed to bind host port for 0.0.0.0:8080:172.17.0.2:8080/tcp: address already in use
+
+Run 'docker run --help' for more information
+
+
+urmi@urmi-HP-Laptop:~/Desktop/Go/chi/project$ docker container stop 76358451039b
+76358451039b
+
+
+
+urmi@urmi-HP-Laptop:~/Desktop/Go/chi/project$ docker run -d -p 8080:8080 go-docker
+606243fb4bb26903fdbe55370012c5caac2dbf09d7843830d31e52e96de66d8f
+docker: Error response from daemon: failed to set up container networking: driver failed programming external connectivity on endpoint wonderful_chandrasekhar (5c8cfd2412ba3a17ec7e7b724776fa588dfebc13f726b87e927ac18f28e64a8a): failed to bind host port for 0.0.0.0:8080:172.17.0.2:8080/tcp: address already in use
+
+Run 'docker run --help' for more information
+
+
+
+urmi@urmi-HP-Laptop:~/Desktop/Go/chi/project$ docker container ls
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+
+
+
+urmi@urmi-HP-Laptop:~/Desktop/Go/chi/project$ curl http://localhost:8080/api/v1/books
+null
+
+
+
+urmi@urmi-HP-Laptop:~/Desktop/Go/chi/project$ docker login
+Authenticating with existing credentials... [Username: urmibiswas]
+
+i Info → To login with a different account, run 'docker logout' followed by 'docker login'
+
+
+Login Succeeded
+
+
+
+urmi@urmi-HP-Laptop:~/Desktop/Go/chi/project$ docker tag book-server urmibiswas/myChi:latest
+Error parsing reference: "urmibiswas/myChi:latest" is not a valid repository/tag: invalid reference format: repository name (urmibiswas/myChi) must be lowercase
+
+
+
+urmi@urmi-HP-Laptop:~/Desktop/Go/chi/project$ docker tag book-server urmibiswas/mychi:latest
+Error response from daemon: No such image: book-server:latest
+
+
+
+urmi@urmi-HP-Laptop:~/Desktop/Go/chi/project$ docker tag mychi urmibiswas/mychi:latest
+
+
+
+urmi@urmi-HP-Laptop:~/Desktop/Go/chi/project$ docker push urmibiswas/mychi:latest
+The push refers to repository [docker.io/urmibiswas/mychi]
+35faf3786957: Pushed 
+c7d6968bfb0a: Pushed 
+e338534bfa42: Pushed 
+3723e6ad1af4: Pushed 
+46ff4773dde2: Mounted from urmibiswas/go-docker 
+5f70bf18a086: Mounted from urmibiswas/go-docker 
+7c5761aef9e0: Mounted from urmibiswas/go-docker 
+86d0740ea51f: Mounted from urmibiswas/go-docker 
+c291adf4681b: Mounted from urmibiswas/go-docker 
+1c49688bd8eb: Mounted from urmibiswas/go-docker 
+f5b8fb1def00: Mounted from urmibiswas/go-docker 
+8f003894a7ef: Mounted from urmibiswas/go-docker 
+latest: digest: sha256:af7b76955e17fea4f75019e3d2d4aaf238dde20e45495a1c15328665b094e17e size: 2838
+
+
+
+
+
+
+🔧 FULL STEP-BY-STEP SUMMARY
+✅ 1. Navigate to your Go project directory
+bash
+Copy
+Edit
+cd ~/Desktop/Go/chi/project
+✅ 2. Build the Docker image
+bash
+Copy
+Edit
+docker build -t mychi .
+mychi must be lowercase!
+
+✅ 3. Run the container locally (on port 8080)
+First, stop anything using port 8080:
+
+bash
+Copy
+Edit
+docker container ls
+docker container stop <container-id-using-8080>
+Then run:
+
+bash
+Copy
+Edit
+docker run -d -p 8080:8080 mychi
+📦 (Optional) Push to Docker Hub
+✅ 4. Tag your image
+bash
+Copy
+Edit
+docker tag mychi urmibiswas/mychi:latest
+✅ 5. Push it
+bash
+Copy
+Edit
+docker push urmibiswas/mychi:latest
+🌍 To Pull and Run on Any System
+You (or anyone) can now do this from any machine:
+
+✅ 6. Pull from Docker Hub
+bash
+Copy
+Edit
+docker pull urmibiswas/mychi:latest
+✅ 7. Run the container
+bash
+Copy
+Edit
+docker run -d -p 8080:8080 urmibiswas/mychi:latest
+Now your Chi server is running!
+
+Test it:
+
+bash
+Copy
+Edit
+curl http://localhost:8080/api/v1/books
+🧪 Example: Create a Book
+bash
+Copy
+Edit
+curl -X POST http://localhost:8080/api/v1/books \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Docker in Go",
+    "authorList": ["Urmi"],
+    "publishDate": "2025-06-18",
+    "isbn": "123-4567890000"
+  }'
