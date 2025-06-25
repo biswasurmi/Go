@@ -13,7 +13,7 @@ import (
 	"github.com/google/uuid"
 )
 
-// Book model
+// Book represents the data model for a book.
 type Book struct {
 	UUID        string   `json:"uuid"`
 	Name        string   `json:"name"`
@@ -23,48 +23,62 @@ type Book struct {
 }
 
 var (
-	tokenAuth *jwtauth.JWTAuth
-	adminUser = "AdminUser"
-	adminPass = "AdminPassword"
-	bookStore = make(map[string]Book)
+	tokenAuth  *jwtauth.JWTAuth             // JWT authentication handler
+	adminUser  = "AdminUser"                // Basic auth username
+	adminPass  = "AdminPassword"            // Basic auth password
+	bookStore  = make(map[string]Book)      // In-memory book storage: map[UUID]Book
+	authEnable bool                         // Flag to enable or disable authentication
 )
 
 func main() {
+	// Initialize Chi router and add middleware for logging
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
-	var authEnable bool
+
+	// Endpoint to get JWT token using Basic Auth credentials
 	r.Get("/api/v1/get-token", getTokenHandler)
-	// Mount subrouter under /api/v1/books
+
+	// Group routes under /api/v1/books
 	r.Route("/api/v1/books", func(r chi.Router) {
-		//r.Use(basicAuthMiddleware(adminUser, adminPass)) // curl -u AdminUser:AdminPassword http://localhost:8080/api/v1/books for basic authentication
+		// If authentication enabled, require Basic Auth for listing books
+		r.Group(func(r chi.Router) {
+			if authEnable {
+				r.Use(basicAuthMiddleware(adminUser, adminPass))
+			}
+			r.Get("/", listBooks)
+		})
 
-		if authEnable {
-			r.Use(jwtauth.Verifier(tokenAuth))      // Verifies JWT from header/cookie
-			r.Use(jwtauth.Authenticator(tokenAuth)) // Rejects unauthorized
-		}
-
-		r.Post("/", createBook)       // POST /api/v1/books
-		r.Get("/", listBooks)         // GET /api/v1/books
-		r.Get("/{id}", getBook)       // GET /api/v1/books/{id}
-		r.Put("/{id}", updateBook)    // PUT /api/v1/books/{id}
-		r.Delete("/{id}", deleteBook) // DELETE /api/v1/books/{id}
+		// Routes that require JWT authentication
+		r.Group(func(r chi.Router) {
+			if authEnable {
+				r.Use(jwtauth.Verifier(tokenAuth))      // Verify JWT token
+				r.Use(jwtauth.Authenticator(tokenAuth)) // Reject unauthorized requests
+			}
+			r.Post("/", createBook)       // Create new book
+			r.Get("/", listBooks)         // List all books (also accessible with JWT)
+			r.Get("/{id}", getBook)       // Get book by UUID
+			r.Put("/{id}", updateBook)    // Update book by UUID
+			r.Delete("/{id}", deleteBook) // Delete book by UUID
+		})
 	})
 
+	// Command line flags: auth enable/disable and port selection
 	var port string
-
 	flag.BoolVar(&authEnable, "auth", true, "Enable authentication")
 	flag.StringVar(&port, "port", "8080", "Port to run the book server")
 	flag.Parse()
+
 	if !authEnable {
 		fmt.Println("Authentication is disabled")
 	}
 	addr := fmt.Sprintf(":%s", port)
-	fmt.Println("Starting server or port", port)
+	fmt.Println("Starting server on port", port)
 
+	// Start HTTP server
 	http.ListenAndServe(addr, r)
 }
 
-// jwt token
+// getTokenHandler provides a JWT token if valid Basic Auth credentials are provided
 func getTokenHandler(w http.ResponseWriter, r *http.Request) {
 	user, pass, ok := r.BasicAuth()
 	if !ok || user != adminUser || pass != adminPass {
@@ -73,9 +87,9 @@ func getTokenHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//exp := jwtauth.ExpireIn(100000 * 60) // returns int64
-	exp := time.Now().Add(100000 * time.Minute).Unix()
+	exp := time.Now().Add(100000 * time.Minute).Unix() // Token expiration time
 
+	// Create JWT token with claims
 	_, tokenString, err := tokenAuth.Encode(map[string]interface{}{
 		"user_id":  123,
 		"username": adminUser,
@@ -86,31 +100,34 @@ func getTokenHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Send token as JSON response
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{
 		"token": tokenString,
 	})
 }
 
+// Initialize JWT auth with HS256 signing method and secret key
 func init() {
 	tokenAuth = jwtauth.New("HS256", []byte("supersecretkey123"), nil)
 }
 
-// func basicAuthMiddleware(username, password string) func(http.Handler) http.Handler {
-// 	return func(next http.Handler) http.Handler {
-// 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-// 			user, pass, ok := r.BasicAuth()
-// 			if !ok || user != username || pass != password {
-// 				w.Header().Set("WWW-Authenticate", `Basic realm="Restricted"`)
-// 				http.Error(w, "Unauthorized", http.StatusUnauthorized)
-// 				return
-// 			}
-// 			next.ServeHTTP(w, r)
-// 		})
-// 	}
-// }
+// basicAuthMiddleware protects endpoints with Basic Auth
+func basicAuthMiddleware(username, password string) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			user, pass, ok := r.BasicAuth()
+			if !ok || user != username || pass != password {
+				w.Header().Set("WWW-Authenticate", `Basic realm="Restricted"`)
+				http.Error(w, "Unauthorized", http.StatusUnauthorized)
+				return
+			}
+			next.ServeHTTP(w, r)
+		})
+	}
+}
 
-// Create a book
+// createBook handles POST /api/v1/books to add a new book
 func createBook(w http.ResponseWriter, r *http.Request) {
 	var book Book
 	err := json.NewDecoder(r.Body).Decode(&book)
@@ -118,6 +135,7 @@ func createBook(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("Invalid request: %v", err), http.StatusBadRequest)
 		return
 	}
+
 	book.UUID = uuid.NewString()
 	bookStore[book.UUID] = book
 
@@ -125,7 +143,7 @@ func createBook(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(book)
 }
 
-// Get a book by ID
+// getBook handles GET /api/v1/books/{id} to fetch a book by UUID
 func getBook(w http.ResponseWriter, r *http.Request) {
 	bookID := chi.URLParam(r, "id")
 	book, found := bookStore[bookID]
@@ -137,7 +155,7 @@ func getBook(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(book)
 }
 
-// List all books
+// listBooks handles GET /api/v1/books to list all books
 func listBooks(w http.ResponseWriter, r *http.Request) {
 	var books []Book
 	for _, book := range bookStore {
@@ -147,7 +165,7 @@ func listBooks(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(books)
 }
 
-// Update a book by ID
+// updateBook handles PUT /api/v1/books/{id} to update a book by UUID
 func updateBook(w http.ResponseWriter, r *http.Request) {
 	bookID := chi.URLParam(r, "id")
 	_, found := bookStore[bookID]
@@ -170,7 +188,7 @@ func updateBook(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(updatedBook)
 }
 
-// Delete a book by ID
+// deleteBook handles DELETE /api/v1/books/{id} to remove a book by UUID
 func deleteBook(w http.ResponseWriter, r *http.Request) {
 	bookID := chi.URLParam(r, "id")
 	book, found := bookStore[bookID]
@@ -184,225 +202,3 @@ func deleteBook(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(book)
 }
-
-/*
-
-📚 Book REST API Documentation
-✅ Overview
-This API allows basic CRUD (Create, Read, Update, Delete) operations for books stored in memory (map[string]Book).
-
-Each book has the following structure:
-
-json
-Copy
-Edit
-{
-  "uuid": "auto-generated",
-  "name": "string",
-  "authorList": ["string"],
-  "publishDate": "YYYY-MM-DD",
-  "isbn": "string"
-}
-🚀 How to Run the Server
-Make sure Go is installed.
-
-Save your code to a file named main.go.
-
-Run this in terminal:
-
-bash
-Copy
-Edit
-go run main.go
-The server will start at:
-
-arduino
-Copy
-Edit
-http://localhost:8080
-📘 Endpoints Summary
-Method	Path	Description
-POST	/api/v1/books	Create a new book
-GET	/api/v1/books/{id}	Get a book by its UUID
-GET	/api/v1/books	Get list of all books
-PUT	/api/v1/books/{id}	Update a book by UUID
-DELETE	/api/v1/books/{id}	Delete a book by UUID
-
-📥 POST /api/v1/books
-➤ Create a new book
-Request:
-
-bash
-Copy
-Edit
-curl -X POST http://localhost:8080/api/v1/books \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Go Programming",
-    "authorList": ["Alan A. A."],
-    "publishDate": "2023-01-01",
-    "isbn": "123-4567890123"
-  }'
-Response:
-
-json
-Copy
-Edit
-{
-  "uuid": "generated-uuid",
-  "name": "Go Programming",
-  "authorList": ["Alan A. A."],
-  "publishDate": "2023-01-01",
-  "isbn": "123-4567890123"
-}
-📖 GET /api/v1/books/{id}
-➤ Get a single book by its UUID
-Example:
-
-bash
-Copy
-Edit
-curl http://localhost:8080/api/v1/books/your-book-uuid
-Response:
-
-json
-Copy
-Edit
-{
-  "uuid": "your-book-uuid",
-  "name": "Go Programming",
-  "authorList": ["Alan A. A."],
-  "publishDate": "2023-01-01",
-  "isbn": "123-4567890123"
-}
-If not found:
-
-text
-Copy
-Edit
-Book not Found
-📚 GET /api/v1/books
-➤ List all books
-bash
-Copy
-Edit
-curl http://localhost:8080/api/v1/books
-Response:
-
-json
-Copy
-Edit
-[
-  {
-    "uuid": "uuid-1",
-    "name": "Book 1",
-    "authorList": ["Author A"],
-    "publishDate": "2024-01-01",
-    "isbn": "111-1111111111"
-  },
-  {
-    "uuid": "uuid-2",
-    "name": "Book 2",
-    "authorList": ["Author B"],
-    "publishDate": "2024-02-02",
-    "isbn": "222-2222222222"
-  }
-]
-🔁 PUT /api/v1/books/{id}
-➤ Update an existing book
-Example:
-
-bash
-Copy
-Edit
-curl -X PUT http://localhost:8080/api/v1/books/your-book-uuid \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Updated Book",
-    "authorList": ["New Author"],
-    "publishDate": "2025-06-01",
-    "isbn": "999-9999999999"
-  }'
-Response:
-
-json
-Copy
-Edit
-{
-  "uuid": "your-book-uuid",
-  "name": "Updated Book",
-  "authorList": ["New Author"],
-  "publishDate": "2025-06-01",
-  "isbn": "999-9999999999"
-}
-❌ DELETE /api/v1/books/{id}
-➤ Delete a book by its UUID
-bash
-Copy
-Edit
-curl -X DELETE http://localhost:8080/api/v1/books/your-book-uuid
-Response:
-
-json
-Copy
-Edit
-{
-  "uuid": "your-book-uuid",
-  "name": "Deleted Book",
-  "authorList": ["Author A"],
-  "publishDate": "2024-01-01",
-  "isbn": "111-1111111111"
-}
-If not found:
-
-text
-Copy
-Edit
-Book not found
-
-
-w.Header().Set("Content-Type", "application/json")
-🔍 What it does:
-This tells the client (like curl, a browser, or Postman):
-
-“The response body is in JSON format.”
-
-It sets the HTTP response header:
-
-pgsql
-Copy
-Edit
-Content-Type: application/json
-🤖 Why it's important:
-Many clients use this header to decide how to parse the response.
-
-Without this, the client might treat the response as plain text or HTML.
-
-✅ This line is always recommended when you're sending JSON from a Go server.
-
-
-json.NewEncoder(w).Encode(updatedBook)
-🔍 What it does:
-It creates a JSON encoder that writes directly to the http.ResponseWriter (w).
-
-It serializes (marshals) updatedBook into JSON.
-
-Then it writes that JSON into the response body.
-
-This is equivalent to:
-
-go
-Copy
-Edit
-jsonBytes, _ := json.Marshal(updatedBook)
-w.Write(jsonBytes)
-But using json.NewEncoder(w).Encode(...) is:
-
-Cleaner
-
-More efficient (direct streaming)
-
-Automatically writes a newline after the JSON
-
-
-*/

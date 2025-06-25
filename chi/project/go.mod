@@ -1,9 +1,9 @@
-module myChi
+module book-server
 
-go 1.22
+go 1.22.2
 
 require (
-	github.com/go-chi/chi/v5 v5.2.1
+	github.com/go-chi/chi/v5 v5.2.2
 	github.com/go-chi/jwtauth/v5 v5.3.3
 	github.com/google/uuid v1.6.0
 )
