@@ -1,1 +1,10 @@
+# .gitignore
 *.deb
+*.exe
+*.zip
+*.tar.gz
+*.iso
+*.img
+*.bin
+*.DS_Store
+*.log
